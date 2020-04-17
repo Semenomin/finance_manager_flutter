@@ -6,7 +6,12 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+
+  flutter_bloc: ^0.4.11
   cupertino_icons: ^0.1.2
+  http: ^0.12.0
+  equatable: ^0.1.1
+    
 dev_dependencies:
   flutter_test:
     sdk: flutter

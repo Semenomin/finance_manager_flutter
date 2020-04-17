@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:iucome/app.dart';
 import 'package:iucome/image_placeholder.dart';
 import 'package:iucome/appColors.dart';
-import 'package:iucome/layout/letter_spacing.dart';
+import 'package:iucome/entitys/currency.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 
 class AuthorizationPage extends StatefulWidget {
   const AuthorizationPage();
@@ -46,10 +48,6 @@ class _MainView extends StatelessWidget {
   
   final TextEditingController usernameController;
   final TextEditingController passwordController;
-
-  void _login(BuildContext context) {
-    Navigator.of(context).pushNamed(IucomeApp.homeRoute);
-  }
   
   @override
   Widget build(BuildContext context) {
@@ -186,7 +184,11 @@ class _LoginButtonState extends State<LoginButton> {
   Widget build(BuildContext context) {
     return ButtonBar(
        children: [FlatButton(
-        onPressed: (){Navigator.of(context,rootNavigator:true).pop();},
+        onPressed: (){
+          if(_login()){
+            Navigator.of(context).pushNamed(IucomeApp.homeRoute);
+          }
+        },
         child: Text(
           'Sign in',
           style: TextStyle(color: AppColors.gray),
@@ -209,7 +211,7 @@ class _LoginButtonState extends State<LoginButton> {
           borderRadius: BorderRadius.all(Radius.circular(8)),
         ),
         onPressed: () {
-          Navigator.of(context).pushNamed(IucomeApp.homeRoute);
+            Navigator.of(context).pushNamed(IucomeApp.currencyRoute);
           },
         ),
       ]
@@ -217,6 +219,6 @@ class _LoginButtonState extends State<LoginButton> {
   }
 }
 
-
-
-
+bool _login(){
+return true;
+}
