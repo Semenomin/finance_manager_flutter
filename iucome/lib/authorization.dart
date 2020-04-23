@@ -2,10 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:iucome/app.dart';
 import 'package:iucome/image_placeholder.dart';
 import 'package:iucome/appColors.dart';
-import 'package:iucome/entitys/currency.dart';
 import 'package:http/http.dart' as http;
-import 'dart:convert';
-
+var client = http.Client();
 class AuthorizationPage extends StatefulWidget {
   const AuthorizationPage();
 
@@ -59,7 +57,7 @@ class _MainView extends StatelessWidget {
       SizedBox(height: 20),
       _PasswordTextField(),
       SizedBox(height: 110),
-      LoginButton()
+      LoginButton(passwordController: passwordController,usernameController: usernameController,)
     ];
     return Column(
       children: [
@@ -170,23 +168,45 @@ class PrimaryColorOverride extends StatelessWidget {
 
 class LoginButton extends StatefulWidget {
   LoginButton({ 
-    @required this.onTap,
+    this.passwordController,
+    this.usernameController
     });
-
-  final VoidCallback onTap;
+  final TextEditingController usernameController;
+  final TextEditingController passwordController;
 
   @override
-  _LoginButtonState createState() => _LoginButtonState();
+  _LoginButtonState createState() => _LoginButtonState(usernameController,passwordController);
 }
 
-class _LoginButtonState extends State<LoginButton> {
+class _LoginButtonState  extends State<LoginButton> {
+  _LoginButtonState( 
+    this.passwordController,
+    this.usernameController
+    );
+  final TextEditingController usernameController;
+  final TextEditingController passwordController;
   @override
   Widget build(BuildContext context) {
     return ButtonBar(
        children: [FlatButton(
         onPressed: (){
-          if(_login()){
-            Navigator.of(context).pushNamed(IucomeApp.homeRoute);
+          List list = _login();
+          if(list[0]){
+            Navigator.of(context).pushNamed(IucomeApp.homeRoute,
+            arguments: <String,int>{
+              'userId': list[1],
+            });
+          }
+          else {
+            List reg;
+            _registration("flexwwx",'wewefwe').then((res)=>reg=res);
+            // if(reg[0])
+            // {
+            //   Navigator.of(context).pushNamed(IucomeApp.homeRoute,
+            //   arguments: <String,int>{
+            //   'userId': reg[1],
+            // });
+            // }
           }
         },
         child: Text(
@@ -219,6 +239,22 @@ class _LoginButtonState extends State<LoginButton> {
   }
 }
 
-bool _login(){
-return true;
+List _login(){
+  int userId = 1;
+  return [true,userId];
+}
+
+Future<List> _registration(String login,String pass) async{
+  final response = await client.post('http://192.168.100.8:3000/users/auth?login=$login&pass=$pass');
+  print(response.body);
+  print(login);
+  print(pass);
+
+  // if(response.body == 'User exist'){
+  //   return [false,null];
+  // }
+  // else {
+  //   print(response.body);
+  //   return [true,response.body];
+  // }
 }

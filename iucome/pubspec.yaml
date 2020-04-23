@@ -15,6 +15,7 @@ dependencies:
 dev_dependencies:
   flutter_test:
     sdk: flutter
+  syncfusion_flutter_charts: ^18.1.42
 
 
 flutter:

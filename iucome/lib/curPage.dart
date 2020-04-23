@@ -39,19 +39,24 @@ class _CurPageState extends State<CurPage> {
 }
 
 Future<List<Currency>> fetchCur() async{
-  String base = 'USD';
-  String app_id = '3861d8bbdc994542b5ef26fadf159471';
-  List<Currency> cur = new List<Currency>();
-  final response = await http.get('https://openexchangerates.org/api/latest.json?app_id=$app_id&base=$base');
-  if (response.statusCode == 200) {
-    Map data = await json.decode(response.body) as Map;
-    data['rates'].forEach((k,v){
-      cur.add(Currency(curAbbreviation: k,rate: v.toString()));
-    });
-    print(cur);
-    return cur;
+  try{
+    String base = 'USD';
+    String app_id = '3861d8bbdc994542b5ef26fadf159471';
+    List<Currency> cur = new List<Currency>();
+    final response = await http.get('https://openexchangerates.org/api/latest.json?app_id=$app_id&base=$base');
+    if (response.statusCode == 200) {
+      Map data = await json.decode(response.body) as Map;
+      data['rates'].forEach((k,v){
+        cur.add(Currency(curAbbreviation: k,rate: v.toString()));
+      });
+      return cur;
+    }
+    else throw Exception('error fetching currencies');
   }
-  else throw Exception('error fetching currencies');
+  catch (e){
+    print(e.toString());
+  }
+ 
 }
 
 class CurWidget extends StatelessWidget {

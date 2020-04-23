@@ -17,10 +17,10 @@ class IucomeApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Iucome',
-      home: const HomePage(),
+      home: const BottomTabbar(),
       initialRoute: authorizationRoute,
       routes: <String,WidgetBuilder>{
-        homeRoute: (context) => const HomePage(),
+        homeRoute: (context) => const BottomTabbar(),
         authorizationRoute: (context) => const AuthorizationPage(), 
         registrationRoute: (context) => const RegistrationPage(),
         currencyRoute: (context) => const CurPage()
