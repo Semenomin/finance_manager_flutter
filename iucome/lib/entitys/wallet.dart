@@ -1,24 +1,25 @@
-import 'dart:ffi';
-import 'package:flutter/foundation.dart';
-
 class Wallet{
-  Wallet(this.name,this.cash,this.expense);
+  Wallet(this.name,this.cash,this.expenses);
   String name;
   double cash;
-  List<Expence> expense;
+  List<Expence> expenses = [];
 }
 
 class Expence{
-  Expence(this.name,this.cash,this.category,this.date,this.wallet);
+  Expence(this.name,this.cash,this.date);
   String name;
-  String category;
   double cash;
-  String wallet;
   String date;
 }
 
-List<String> category = [
-"Products",
-"flex",
-"hype"
-];
+class WalletCategory{
+  WalletCategory(this.name,this.cash,this.expence);
+  String name;
+  double cash=0;
+  List<Expence> expence = List<Expence>();
+
+  void addExpence(Expence ex){
+    expence.add(ex);
+    cash+=ex.cash;
+  }
+}

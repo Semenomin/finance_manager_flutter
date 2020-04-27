@@ -3,6 +3,7 @@ import 'package:iucome/authorization.dart';
 import 'package:iucome/curPage.dart';
 import 'package:iucome/home.dart';
 import 'package:iucome/registration.dart';
+import 'package:iucome/database/db.dart';
 void main() {
   runApp(IucomeApp());
 }
@@ -15,6 +16,7 @@ class IucomeApp extends StatelessWidget {
   static const String currencyRoute = "/curPage";
   @override
   Widget build(BuildContext context) {
+    DaBa.connectDB();
     return MaterialApp(
       title: 'Iucome',
       home: const BottomTabbar(),
