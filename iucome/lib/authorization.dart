@@ -1,9 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:iucome/app.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:toast/toast.dart';
 import 'package:iucome/image_placeholder.dart';
 import 'package:iucome/appColors.dart';
 import 'package:http/http.dart' as http;
-var client = http.Client();
+import 'package:iucome/http_config.dart';
+import 'package:iucome/database/db.dart';
+
 class AuthorizationPage extends StatefulWidget {
   const AuthorizationPage();
 
@@ -17,17 +21,15 @@ class _AuthorizationPageState extends State<AuthorizationPage> {
 
   @override
   Widget build(BuildContext context) {
-  return Container(
-        child: Scaffold(
-          body: SafeArea(
-            child: _MainView(
-              usernameController: _usernameController,
-              passwordController: _passwordController,
-            ),
-          ),
-        ),
-      );
-    }
+    return Scaffold(
+      body: SafeArea(
+        child: _MainView(
+          usernameController: _usernameController,
+          passwordController: _passwordController,
+        )
+      )
+    );   
+  }
 
   @override
   void dispose(){
@@ -38,14 +40,14 @@ class _AuthorizationPageState extends State<AuthorizationPage> {
 }
 
 class _MainView extends StatelessWidget {
-  const _MainView({
+  _MainView({
     Key key,
     this.passwordController,
     this.usernameController
   }) : super(key: key);
   
-  final TextEditingController usernameController;
-  final TextEditingController passwordController;
+  TextEditingController usernameController;
+  TextEditingController passwordController;
   
   @override
   Widget build(BuildContext context) {
@@ -53,26 +55,28 @@ class _MainView extends StatelessWidget {
     listViewChildren = [
       const _SmallLogo(),
       SizedBox(height: 20),
-      _UsernameTextField(),
+      _UsernameTextField(usernameController),
       SizedBox(height: 20),
-      _PasswordTextField(),
+      _PasswordTextField(passwordController),
       SizedBox(height: 110),
       LoginButton(passwordController: passwordController,usernameController: usernameController,)
     ];
-    return Column(
-      children: [
-        Expanded(
-          child: Align(
-            alignment: Alignment.center,
-            child: ListView(
-              shrinkWrap: true,
-              padding: const EdgeInsets.symmetric(horizontal: 24),
-              children: listViewChildren,
-            ),
-          ),
-        ),
-      ],
-    );
+                    return Scaffold(
+                        body: Column(
+                                  children: [
+                                    Expanded(
+                                      child: Align(
+                                        alignment: Alignment.center,
+                                        child: ListView(
+                                          shrinkWrap: true,
+                                          padding: const EdgeInsets.symmetric(horizontal: 24),
+                                          children: listViewChildren,
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                )
+                        );
   }
 }
 
@@ -96,19 +100,26 @@ class _SmallLogo extends StatelessWidget{
 }
 
 class _UsernameTextField extends StatelessWidget {
-  const _UsernameTextField();
+
+TextEditingController controller; 
+
+_UsernameTextField(TextEditingController controllerIn){
+  controller = controllerIn;
+}
 
   @override
   Widget build(BuildContext context) {
+
+    
+
     final colorScheme = Theme.of(context).colorScheme;
 
-    final _usernameController = TextEditingController();
 
     return PrimaryColorOverride(
       color: AppColors.gray,
       child: Container(
         child: TextField(
-          controller: _usernameController,
+          controller: controller,
           cursorColor: colorScheme.onSurface,
           decoration: InputDecoration(
             labelText: 'Login',
@@ -123,19 +134,21 @@ class _UsernameTextField extends StatelessWidget {
 }
 
 class _PasswordTextField extends StatelessWidget {
-  const _PasswordTextField();
 
+TextEditingController controller; 
+
+_PasswordTextField(TextEditingController controllerIn){
+  controller = controllerIn;
+}
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
-
-    final _passwordController = TextEditingController();
 
     return PrimaryColorOverride(
       color: AppColors.gray,
       child: Container(
         child: TextField(
-          controller: _passwordController,
+          controller: controller,
           cursorColor: colorScheme.onSurface,
           obscureText: true,
           decoration: InputDecoration(
@@ -183,31 +196,31 @@ class _LoginButtonState  extends State<LoginButton> {
     this.passwordController,
     this.usernameController
     );
+
   final TextEditingController usernameController;
   final TextEditingController passwordController;
+  
   @override
   Widget build(BuildContext context) {
     return ButtonBar(
        children: [FlatButton(
         onPressed: (){
-          List list = _login();
-          if(list[0]){
-            Navigator.of(context).pushNamed(IucomeApp.homeRoute,
-            arguments: <String,int>{
-              'userId': list[1],
-            });
-          }
-          else {
-            List reg;
-            _registration("flexwwx",'wewefwe').then((res)=>reg=res);
-            // if(reg[0])
-            // {
-            //   Navigator.of(context).pushNamed(IucomeApp.homeRoute,
-            //   arguments: <String,int>{
-            //   'userId': reg[1],
-            // });
-            // }
-          }
+          _login(usernameController.text.toString(), passwordController.text.toString()).then((res){
+            if(res[0]){
+              
+              DaBa.syncDBout(res[1]);                                                                   //SyncDB
+              setdata(res[1]).then(
+                Navigator.of(context).pushNamed(IucomeApp.homeRoute,
+                arguments: <String,String>{
+                'userId': res[1],
+                })
+              );
+            
+            }
+            else{
+              Toast.show('Invalid login or password',context, gravity: Toast.BOTTOM);
+            }
+          });
         },
         child: Text(
           'Sign in',
@@ -231,30 +244,50 @@ class _LoginButtonState  extends State<LoginButton> {
           borderRadius: BorderRadius.all(Radius.circular(8)),
         ),
         onPressed: () {
-            Navigator.of(context).pushNamed(IucomeApp.currencyRoute);
+            _registration(usernameController.text.toString(), passwordController.text.toString()).then((res){
+            if(res[0]){
+              setdata(res[1]).then(
+                DaBa.createUser(res[1]),
+                Navigator.of(context).pushNamed(IucomeApp.homeRoute,
+                arguments: <String,String>{
+                'userId': res[1],
+              })
+              );
+            }
+            else{
+              Toast.show('User exists!',context, gravity: Toast.BOTTOM);
+            }
+          });
           },
         ),
       ]
     );
   }
+
+  setdata(String id) async {
+    SharedPreferences preferences = await SharedPreferences.getInstance();
+    preferences.setString('user', id);
+  }
 }
 
-List _login(){
-  int userId = 1;
-  return [true,userId];
-}
-
-Future<List> _registration(String login,String pass) async{
-  final response = await client.post('http://192.168.100.8:3000/users/auth?login=$login&pass=$pass');
+Future<List> _login(String pass,String login) async {
+  
+  final response = await http.post('http://${HttpConfig.ip}:${HttpConfig.port}/users/auth?login=$login&pass=$pass');
   print(response.body);
-  print(login);
-  print(pass);
+  if(response.body == 'none'){
+    return [false,'none'];
+  }
+  else{
+    return [true,response.body];
+  }
+}
 
-  // if(response.body == 'User exist'){
-  //   return [false,null];
-  // }
-  // else {
-  //   print(response.body);
-  //   return [true,response.body];
-  // }
+Future<List> _registration(String pass,String login) async{
+  final response = await http.post('http://${HttpConfig.ip}:${HttpConfig.port}/users/create?login=$login&pass=$pass');
+  if(response.body == 'none'){
+    return [false,'none'];
+  }
+  else{
+    return [true,response.body];
+  }
 }

@@ -4,6 +4,7 @@ import 'package:iucome/CustomDialog.dart';
 import 'package:iucome/appColors.dart';
 import 'package:iucome/entitys/tab.dart';
 import 'package:iucome/entitys/wallet.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
 import 'package:iucome/entitys/subItem.dart';
 import 'package:backdrop/backdrop.dart';
@@ -12,17 +13,16 @@ import 'package:iucome/database/db.dart';
 
 
 class BottomTabbar extends StatefulWidget {
-  const BottomTabbar({Key key}) : super(key: key);
-  
+  BottomTabbar({Key key}) : super(key: key);
+
   @override
   _BottomTabbarState createState() => _BottomTabbarState();
 
 }
 
 class _BottomTabbarState extends State<BottomTabbar> with SingleTickerProviderStateMixin{
-  
-  
- 
+
+  String user_id;
   
   TabController _tabController;
 
@@ -49,11 +49,14 @@ class _BottomTabbarState extends State<BottomTabbar> with SingleTickerProviderSt
 
   @override
   Widget build(BuildContext context) {
-    
+    final Map arguments = ModalRoute.of(context).settings.arguments as Map;
+    if(arguments != null){
+      user_id = arguments.values.first;
+    }
     return Scaffold(
       appBar: null,
       body: FutureBuilder<List<Wallet>>(
-        future: DaBa.getWallets(),
+        future: DaBa.getWallets(user_id),
         builder: (BuildContext context, AsyncSnapshot<List<Wallet>> snapshot){
           if(!snapshot.hasData){
             return Center(
@@ -63,7 +66,7 @@ class _BottomTabbarState extends State<BottomTabbar> with SingleTickerProviderSt
           else {
             final wallets = snapshot.data;
             return FutureBuilder<List<WalletCategory>>(
-              future: DaBa.getCategories(),
+              future: DaBa.getCategories(user_id),
               builder: (BuildContext context, AsyncSnapshot<List<WalletCategory>> snapshot){
                 if(!snapshot.hasData){
                   return Center(
@@ -76,7 +79,7 @@ class _BottomTabbarState extends State<BottomTabbar> with SingleTickerProviderSt
                     children: <Widget>[
                       Center(child: Icon(Icons.cloud, size:64.0, color:AppColors.gray)),
                       WalletsTab(wallets,categories),
-                      AppBarExpensesPage(cat:categories,wall:wallets),   
+                      AppBarExpensesPage(cat:categories,wall:wallets,user_id: user_id,),   
                     ],
                     controller: _tabController
                   );
@@ -198,36 +201,41 @@ List<PieSeries<ChartSampleData, String>> getDefaultPieSeries(bool isTileView,Wal
   ];
 }
 
-class AppBarExpensesPage extends StatelessWidget {
-  AppBarExpensesPage({this.cat,this.wall,Key key}) : super(key: key);
+class AppBarExpensesPage extends StatefulWidget {
+  AppBarExpensesPage({this.cat,this.wall,this.user_id,Key key}) : super(key: key);
   List<WalletCategory> cat = [];
   List<Wallet> wall = [];
+  String user_id;
+
+  @override
+  _AppBarExpensesPageState createState() => _AppBarExpensesPageState(cat,wall,user_id);
+}
+
+class _AppBarExpensesPageState extends State<AppBarExpensesPage> {
+
+  _AppBarExpensesPageState(this.cat,this.wall,this.user_id){}
+  List<WalletCategory> cat = [];
+  List<Wallet> wall = [];
+  String user_id;
+  String excat;
+
+  @override
+  void initState() {
+    super.initState();
+    excat = null;
+  }
+
   @override
   Widget build(BuildContext context) {
     List<SizedBox> boxes = [];
+    List<SizedBox> expenceBoxes = [];
+
+
     for (var item in cat) {
-      boxes.add(SizedBox(
-            height: 50,
-            child: FlatButton(
-              onPressed: ()=>{DaBa.getCategories()}, 
-              child: Text(
-                item.name,
-                style: TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.normal    
-                ),
-              )),
-          ));
-    }
-  
-    return BackdropScaffold(
-      title:Text("Expences"),
-      iconPosition: BackdropIconPosition.leading,
-      headerHeight: 0.0,
-      frontLayer: ListView(
-        padding: EdgeInsets.all(10),
-        children: <Widget>[
-          SizedBox(
+      if(item.name == excat||excat == null){
+      for(var item2 in item.expence){
+        expenceBoxes.add(
+        SizedBox(
             height: 150.0,
             child: Card(
             elevation: 2,
@@ -242,17 +250,70 @@ class AppBarExpensesPage extends StatelessWidget {
 
               },
               child: Align(
-                alignment: Alignment.topRight,
+                alignment: Alignment.topLeft,
                 child: Padding(
                   padding: EdgeInsets.all(8),
-                  child: Text("Flex"),
+                  child:Row(
+                    children: <Widget>[
+                      Column(
+                        children: <Widget>[
+                          Text("Name:",
+                          style: TextStyle(fontSize: 25)
+                          ),
+                          Text("Cash:",
+                          style: TextStyle(fontSize: 30)),
+                          Text("Category:",
+                          style: TextStyle(fontSize: 15))
+                        ],
+                      ),
+                      Column(
+                        children: <Widget>[
+                          Text(item2.name,
+                          style: TextStyle(fontSize: 25)
+                          ),
+                          Text(item2.cash.toString(),
+                          style: TextStyle(fontSize: 30)),
+                          Text(item.name,
+                          style: TextStyle(fontSize: 15))
+                        ],
+                      )
+                    ],
+                  ) 
                 ),
               )
-              
             ),
           ),
-          )
-        ],
+        )
+        );
+      }
+
+      }
+      
+      boxes.add(SizedBox(
+            height: 50,
+            child: FlatButton(
+              onPressed: (){
+                setState((){
+                  excat = item.name;
+                });
+              }, 
+              child: Text(
+                item.name,
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.normal    
+                ),
+              )),
+          ));
+    }
+
+    return BackdropScaffold(
+      title:Text("Expences"),
+      iconPosition: BackdropIconPosition.leading,
+      headerHeight: 0.0,
+      frontLayer: ListView(
+        padding: EdgeInsets.all(10),
+        children: expenceBoxes,
       ),
       backLayer: ListView(
         padding: EdgeInsets.all(10),
@@ -265,7 +326,7 @@ class AppBarExpensesPage extends StatelessWidget {
           showDialog(
             context: context,
             builder: (context){
-              return CustomDialog(cat: cat,wall:wall,);
+              return CustomDialog(cat: cat,wall:wall,user_id: user_id,);
             }
           );
         }
@@ -275,5 +336,9 @@ class AppBarExpensesPage extends StatelessWidget {
   }
 }
 
-
+getdata() async {
+  SharedPreferences preferences = await SharedPreferences.getInstance();
+  String value = preferences.getString('user');
+  return value;
+}
 

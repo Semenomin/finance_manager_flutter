@@ -3,34 +3,41 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:iucome/entitys/wallet.dart';
 import 'package:toast/toast.dart';
+import 'package:iucome/database/db.dart';
+
+import 'app.dart';
 
 class CustomDialog extends StatefulWidget {
 
-  CustomDialog({this.cat,this.wall,Key key}) : super(key: key);
+  CustomDialog({this.cat,this.wall,this.user_id,Key key}) : super(key: key);
   List<WalletCategory> cat = [];
   List<Wallet> wall = [];
-
+  String user_id;
   @override
-  _CustomDialogState createState() => _CustomDialogState(cat,wall);
+  _CustomDialogState createState() => _CustomDialogState(cat,wall,user_id);
 }
 
 class _CustomDialogState extends State<CustomDialog> {
-  _CustomDialogState(List<WalletCategory> cat,List<Wallet> wall){
+  _CustomDialogState(List<WalletCategory> cat,List<Wallet> wall,String user_id){
     this.cat = cat;
     this.wall = wall;
+    this.user_id = user_id;
   }
 
   var formatter = new DateFormat('dd-MM-yyyy');
 
+  String user_id;
   List<WalletCategory> cat = [];
   List<Wallet> wall = [];
 
 
   TextEditingController _controllerCash = TextEditingController();
   TextEditingController _controllerName = TextEditingController();
+  TextEditingController _newCategory = TextEditingController();
 
   String _selectedCategory;
   String _selectedWallet;
+  
 
   @override
   Widget build(BuildContext context) {
@@ -145,6 +152,53 @@ class _CustomDialogState extends State<CustomDialog> {
                     ),
                   )
                 ),
+              FlatButton(
+                color: Colors.blueGrey,
+                onPressed: ()async{
+                  var res = await showDialog(
+                    context: context,
+                    builder: (context){
+                      return AlertDialog(
+                        contentPadding: const EdgeInsets.all(16.0),
+                        content: new Row(
+                          children: <Widget>[
+                            new Expanded(
+                              child: new TextField(
+                                controller: _newCategory,
+                                autofocus: true,
+                                decoration: new InputDecoration(
+                                labelText: 'Category name', hintText: 'something'),
+                              ),
+                            )
+                          ]
+                        ),
+                        actions: <Widget>[
+                        new FlatButton(
+                          child: const Text('CANCEL'),
+                          onPressed: () {
+                            Navigator.pop(context);
+                          }),
+                        new FlatButton(
+                          child: const Text('OK'),
+                          onPressed: () {
+                            _selectedCategory = _newCategory.text;
+                            Navigator.of(context).pop(_newCategory.text);
+                          })
+                        ],
+                      );
+                    }  
+                  );
+                  setState(() {
+                    cat.add(WalletCategory(res,0,List<Expence>()));
+                  });
+                },
+                child:Text(
+                  "Add category",
+                  style: TextStyle(
+                    color:Colors.white
+                  ),
+                )
+              ),
               ListTile(
                 title: Text(
                   "Category",
@@ -214,7 +268,12 @@ class _CustomDialogState extends State<CustomDialog> {
                             );
                           }
                           else{
-                            Navigator.pop(context);
+                            cat[cat.indexWhere((ca)=>ca.name == _selectedCategory)].addExpence(Expence(_controllerName.text,double.parse(cash),DateTime.now().toString()));
+                            DaBa.addExpense(_controllerName.text, cash, _selectedCategory, _selectedWallet, user_id);
+                            Navigator.of(context).pushNamed(IucomeApp.homeRoute,
+                             arguments: <String,String>{
+                             'userId': user_id,
+                             });
                           }
                         }
                       },
