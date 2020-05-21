@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:iucome/entitys/wallet.dart';
@@ -7,18 +6,18 @@ import 'package:iucome/database/db.dart';
 
 import 'app.dart';
 
-class CustomDialog extends StatefulWidget {
+class IncomeCustomDialog extends StatefulWidget {
 
-  CustomDialog({this.cat,this.wall,this.user_id,Key key}) : super(key: key);
+  IncomeCustomDialog({this.cat,this.wall,this.user_id,Key key}) : super(key: key);
   List<WalletCategory> cat = [];
   List<Wallet> wall = [];
   String user_id;
   @override
-  _CustomDialogState createState() => _CustomDialogState(cat,wall,user_id);
+  _IncomeCustomDialogState createState() => _IncomeCustomDialogState(cat,wall,user_id);
 }
 
-class _CustomDialogState extends State<CustomDialog> {
-  _CustomDialogState(List<WalletCategory> cat,List<Wallet> wall,String user_id){
+class _IncomeCustomDialogState extends State<IncomeCustomDialog> {
+  _IncomeCustomDialogState(List<WalletCategory> cat,List<Wallet> wall,String user_id){
     this.cat = cat;
     this.wall = wall;
     this.user_id = user_id;
@@ -67,7 +66,7 @@ class _CustomDialogState extends State<CustomDialog> {
     return AlertDialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(width * 0.050)),
         title: Text(
-          "Add Expence",
+          "Add Income",
           textAlign: TextAlign.center,
           style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
         ),
@@ -216,23 +215,6 @@ class _CustomDialogState extends State<CustomDialog> {
                   items: _dropDownCategoryItem,
                 ),
               ),
-              ListTile(
-                title: Text(
-                  "Wallet",
-                   style: TextStyle(
-                    color: Colors.white
-                  ),
-                ),
-                trailing: DropdownButton<String>(
-                  value: _selectedWallet,
-                  onChanged: (String newValue){
-                    setState(() {
-                      _selectedWallet = newValue;
-                    });
-                  },
-                  items: _dropDownWalletItem,
-                ),
-              ),
               Padding(
                 padding: EdgeInsets.only(top: width * 0.09),
                 child: Row(
@@ -261,15 +243,15 @@ class _CustomDialogState extends State<CustomDialog> {
                           else{
                               cash = _controllerCash.text; 
                           }
-                          if(_selectedCategory == null||_selectedWallet == null){
+                          if(_selectedCategory == null){
                             showToast(
-                              "Input Category or Wallet", 
+                              "Input Category", 
                               gravity: Toast.BOTTOM
                             );
                           }
                           else{
-                            cat[cat.indexWhere((ca)=>ca.name == _selectedCategory)].addExpence(Expence(_controllerName.text,double.parse(cash),DateTime.now().toString()));
-                            DaBa.addExpense(_controllerName.text, cash, _selectedCategory, _selectedWallet, user_id);
+                            cat[cat.indexWhere((ca)=>ca.name == _selectedCategory)].addIncome(Income(_controllerName.text,double.parse(cash),DateTime.now().toString()),wall);
+                            DaBa.addIncome(_controllerName.text,double.parse(cash), _selectedCategory, wall, user_id);
                             Navigator.of(context).pushNamed(IucomeApp.homeRoute,
                              arguments: <String,String>{
                              'userId': user_id,

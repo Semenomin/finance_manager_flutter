@@ -1,9 +1,11 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:iucome/CustomDialog.dart';
+import 'package:iucome/app.dart';
 import 'package:iucome/appColors.dart';
 import 'package:iucome/entitys/tab.dart';
 import 'package:iucome/entitys/wallet.dart';
+import 'package:iucome/incomePage.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
 import 'package:iucome/entitys/subItem.dart';
@@ -77,7 +79,7 @@ class _BottomTabbarState extends State<BottomTabbar> with SingleTickerProviderSt
                   var categories = snapshot.data;
                   return TabBarView(
                     children: <Widget>[
-                      Center(child: Icon(Icons.cloud, size:64.0, color:AppColors.gray)),
+                      IncomePage(cat: categories,wall: wallets,user_id: user_id),
                       WalletsTab(wallets,categories),
                       AppBarExpensesPage(cat:categories,wall:wallets,user_id: user_id,),   
                     ],
@@ -129,6 +131,14 @@ class WalletsTab extends StatelessWidget {
           backgroundColor: Colors.grey,
           automaticallyImplyLeading: false,
           title: Text("Wallets"),
+          actions: <Widget>[
+            IconButton(
+              icon: Icon(Icons.assessment),
+              onPressed: (){
+                Navigator.of(context).pushNamed(IucomeApp.currencyRoute);
+              },
+              )
+          ],
           bottom: TabBar(
             isScrollable: true,
             tabs: [
@@ -175,7 +185,7 @@ SfCircularChart getDefaultPieChart(bool isTileView,Wallet wallet,List<WalletCate
   return SfCircularChart(
     
     title: ChartTitle(
-      text: isTileView ? '' : wallet.cash.toString()),
+      text: isTileView ? '' : wallet.cash.toString()+" \$"),
     legend: Legend(isVisible: isTileView ? false : true),
     series: getDefaultPieSeries(isTileView,wallet,cat),
   );
@@ -184,13 +194,15 @@ SfCircularChart getDefaultPieChart(bool isTileView,Wallet wallet,List<WalletCate
 List<PieSeries<ChartSampleData, String>> getDefaultPieSeries(bool isTileView,Wallet wallet, List<WalletCategory> cat) {
   final List<ChartSampleData> pieData = <ChartSampleData>[];
    for (var categ in cat) {
+      if(categ.cash != 0){
        pieData.add(ChartSampleData(x: categ.name, y: categ.cash, text: categ.name+' '+categ.cash.toString()));
+      }
     }
   return <PieSeries<ChartSampleData, String>>[
     PieSeries<ChartSampleData, String>(
         explode: true,
         explodeIndex: 0,
-        explodeOffset: '10%',
+        explodeOffset: '0',
         dataSource: pieData,
         xValueMapper: (ChartSampleData data, _) => data.x,
         yValueMapper: (ChartSampleData data, _) => data.y,
