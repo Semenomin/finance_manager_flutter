@@ -77,6 +77,7 @@ class _BottomTabbarState extends State<BottomTabbar> with SingleTickerProviderSt
                 }
                 else {
                   var categories = snapshot.data;
+
                   return TabBarView(
                     children: <Widget>[
                       IncomePage(cat: categories,wall: wallets,user_id: user_id),

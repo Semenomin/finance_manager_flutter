@@ -204,21 +204,18 @@ class _LoginButtonState  extends State<LoginButton> {
   Widget build(BuildContext context) {
     return ButtonBar(
        children: [FlatButton(
-        onPressed: (){
+        onPressed: () async{
           _login(usernameController.text.toString(), passwordController.text.toString()).then((res){
             if(res[0]){
-              
-              DaBa.syncDBout(res[1]);                                                                   //SyncDB
               setdata(res[1]).then(
                 Navigator.of(context).pushNamed(IucomeApp.homeRoute,
                 arguments: <String,String>{
                 'userId': res[1],
                 })
               );
-            
             }
             else{
-              Toast.show('Invalid login or password',context, gravity: Toast.BOTTOM);
+              Toast.show(res[1],context, gravity: Toast.BOTTOM);
             }
           });
         },
@@ -245,9 +242,10 @@ class _LoginButtonState  extends State<LoginButton> {
         ),
         onPressed: () {
             _registration(usernameController.text.toString(), passwordController.text.toString()).then((res){
+            
             if(res[0]){
               setdata(res[1]).then(
-                DaBa.createUser(res[1]),
+                DaBa.createUser(res[1],usernameController.text.toString(),passwordController.text.toString()),
                 Navigator.of(context).pushNamed(IucomeApp.homeRoute,
                 arguments: <String,String>{
                 'userId': res[1],
@@ -255,7 +253,7 @@ class _LoginButtonState  extends State<LoginButton> {
               );
             }
             else{
-              Toast.show('User exists!',context, gravity: Toast.BOTTOM);
+              Toast.show(res[1],context, gravity: Toast.BOTTOM);
             }
           });
           },
@@ -271,23 +269,44 @@ class _LoginButtonState  extends State<LoginButton> {
 }
 
 Future<List> _login(String pass,String login) async {
-  
-  final response = await http.post('http://${HttpConfig.ip}:${HttpConfig.port}/users/auth?login=$login&pass=$pass');
-  print(response.body);
-  if(response.body == 'none'){
-    return [false,'none'];
+  try{
+    final res = await http.get('http://${HttpConfig.ip}:${HttpConfig.port}');
+    if(res.statusCode == 200){
+      final response = await http.post('http://${HttpConfig.ip}:${HttpConfig.port}/users/auth?login=$login&pass=$pass');
+      if(response.body == 'none'){
+        return [false,'Invalid Login or Password'];
+      }
+      else{
+        DaBa.syncDBout(response.body);
+        DaBa.syncDBin(response.body,login,pass);
+        return [true,response.body];
+      }
+    }
+    return [false,'Internet problems'];
   }
-  else{
-    return [true,response.body];
+  catch(ex){
+    var res = await DaBa.getLocalId(login, pass);
+    if(res != null){
+      return [true,res];
+    }
+    else{
+      return [false,'invalid login or password'];
+    }
   }
 }
 
 Future<List> _registration(String pass,String login) async{
-  final response = await http.post('http://${HttpConfig.ip}:${HttpConfig.port}/users/create?login=$login&pass=$pass');
-  if(response.body == 'none'){
-    return [false,'none'];
+  final res = await http.get('http://${HttpConfig.ip}:${HttpConfig.port}');
+  if(res.statusCode == 200){
+    final response = await http.post('http://${HttpConfig.ip}:${HttpConfig.port}/users/create?login=$login&pass=$pass');
+    if(response.body == 'none'){
+      return [false,'User exists!'];
+    }
+    else{
+      return [true,response.body];
+    }
   }
   else{
-    return [true,response.body];
+    return[false,'Connection Failed'];
   }
 }

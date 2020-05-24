@@ -51,7 +51,10 @@ Future<List<Currency>> fetchCur() async{
       });
       return cur;
     }
-    else throw Exception('error fetching currencies');
+    else{ 
+      throw Exception('error fetching currencies');
+      return null;
+    }
   }
   catch (e){
     print(e.toString());

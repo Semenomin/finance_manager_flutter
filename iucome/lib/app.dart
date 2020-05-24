@@ -3,7 +3,6 @@ import 'package:iucome/authorization.dart';
 import 'package:iucome/curPage.dart';
 import 'package:iucome/home.dart';
 import 'package:iucome/database/db.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 void main() {
   runApp(IucomeApp());
 }

@@ -5,6 +5,7 @@ import 'dart:convert';
 
 import 'CustomDialog.dart';
 import 'CustomIncomeDialog.dart';
+import 'database/db.dart';
 import 'entitys/wallet.dart';
 
 class IncomePage extends StatefulWidget {
@@ -27,7 +28,17 @@ class _IncomePageState extends State<IncomePage> {
   @override
   Widget build(BuildContext context) {
 
-  for(WalletCategory catt in cat){
+  return FutureBuilder<List<WalletCategory>>(
+    future: DaBa.getCategories(user_id),
+    builder: (BuildContext context, AsyncSnapshot<List<WalletCategory>> snapshot){
+      if(!snapshot.hasData){
+        return Center(
+          child: CircularProgressIndicator(),
+        );
+      }
+      else{
+        cat = snapshot.data;
+        for(WalletCategory catt in cat){
     for(Income income in catt.income){
           incomeBoxes.add(SizedBox(
             height: 150.0,
@@ -105,5 +116,8 @@ class _IncomePageState extends State<IncomePage> {
           children: incomeBoxes,
         ),
     );
+      }
+    }
+  );  
   }
 }
