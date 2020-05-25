@@ -24,7 +24,6 @@ class Income{
 
 class WalletCategory{
   WalletCategory(this.name,this.cash,this.expence,this.income);
-  
   String name;
   double cash=0;
   List<Expence> expence = List<Expence>();

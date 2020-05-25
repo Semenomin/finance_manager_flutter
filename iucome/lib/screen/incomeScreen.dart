@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:iucome/configs/appColors.dart';
 import 'CustomIncomeDialog.dart';
 import 'package:iucome/database/db.dart';
 import 'package:iucome/entitys/wallet.dart';
@@ -39,7 +40,7 @@ class _IncomePageState extends State<IncomePage> {
             height: 150.0,
             child: Card(
             elevation: 2,
-            color: Colors.grey,
+            color: AppColors.gray60,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.all(
                 Radius.circular(16.0)
@@ -78,7 +79,7 @@ class _IncomePageState extends State<IncomePage> {
                         ],
                       )
                     ],
-                  ) 
+                  )
                 ),
               )
             ),
@@ -90,8 +91,9 @@ class _IncomePageState extends State<IncomePage> {
 
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Colors.grey,
-        leading: Icon(Icons.arrow_downward),
+        backgroundColor: AppColors.gray60,
+        leading: Container(),
+        title: Text('Incomes'),
         actions: <Widget>[
           IconButton(
             icon: Icon(Icons.add),
@@ -113,6 +115,6 @@ class _IncomePageState extends State<IncomePage> {
     );
       }
     }
-  );  
+  );
   }
 }

@@ -109,11 +109,8 @@ class DaBa {
   }
 
   static Future<List<Expence>> getCategoryExpenses(String category,String id) async {
-      var path = await initDb('iucome.db');
-    var db = await openDatabase(path);
     List<Expence> ex = [];
     var res = await DaBa.getOperationsBy('expenses', 'category=\'$category\' and user_id=\'$id\'');
-    print(await db.rawQuery("select * from expenses"));
     for (var item in res) {
       ex.add(Expence(item.values.elementAt(2),item.values.elementAt(3),item.values.elementAt(6)));
     }
@@ -253,7 +250,6 @@ class DaBa {
   static Future<void> syncDBexpense(String user_id) async {
     var path = await initDb('iucome.db');
     var db = await openDatabase(path);
-    print(3);
     var last_sync = await db.rawQuery("select last_sync from users where user_id=\'$user_id\'");
     var res;
     if(last_sync.first.values.first == null){
@@ -272,7 +268,6 @@ class DaBa {
   static Future<void> syncDBincome(String user_id) async {
     var path = await initDb('iucome.db');
     var db = await openDatabase(path);
-    print(4);
     var last_sync = await db.rawQuery("select last_sync from users where user_id=\'$user_id\'");
     var res2;
     if(last_sync.first.values.first == null){
@@ -314,14 +309,11 @@ class DaBa {
         }
       }
      });
-    print(5);
     await db.rawQuery("update users set last_sync=datetime(CURRENT_TIMESTAMP, 'localtime') where user_id=\'$user_id\'");
-    print(await db.rawQuery("select * from users"));
   }
 
   static Future<bool> checkUserId(String user_id) async {
     var res = await DaBa.getOperationsBy("wallets","user_id=$user_id");
-    print(1);
     if(res.length != 0){
       return true;
     }

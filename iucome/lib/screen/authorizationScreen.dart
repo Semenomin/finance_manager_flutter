@@ -1,12 +1,12 @@
-import 'package:flutter/material.dart';
-import 'package:iucome/app.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:toast/toast.dart';
 import 'package:iucome/layout/image_placeholder.dart';
-import 'package:iucome/configs/appColors.dart';
-import 'package:http/http.dart' as http;
 import 'package:iucome/configs/http_config.dart';
+import 'package:iucome/configs/appColors.dart';
 import 'package:iucome/database/db.dart';
+import 'package:http/http.dart' as http;
+import 'package:flutter/material.dart';
+import 'package:toast/toast.dart';
+import 'package:iucome/app.dart';
 
 class AuthorizationPage extends StatefulWidget {
   const AuthorizationPage();
@@ -45,8 +45,8 @@ class _MainView extends StatelessWidget {
     this.passwordController,
     this.usernameController
   }) : super(key: key);
-  TextEditingController usernameController;
-  TextEditingController passwordController;
+  final TextEditingController usernameController;
+  final TextEditingController passwordController;
   @override
   Widget build(BuildContext context) {
     List<Widget> listViewChildren;
@@ -99,20 +99,14 @@ class _SmallLogo extends StatelessWidget{
 
 class _UsernameTextField extends StatelessWidget {
 
-TextEditingController controller;
-
+ TextEditingController controller;
 _UsernameTextField(TextEditingController controllerIn){
   controller = controllerIn;
 }
 
   @override
   Widget build(BuildContext context) {
-
-
-
     final colorScheme = Theme.of(context).colorScheme;
-
-
     return PrimaryColorOverride(
       color: AppColors.gray,
       child: Container(
