@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:iucome/authorization.dart';
-import 'package:iucome/curPage.dart';
-import 'package:iucome/home.dart';
+import 'package:iucome/screen/authorizationScreen.dart';
+import 'package:iucome/screen/currencyScreen.dart';
+import 'package:iucome/screen/home.dart';
 import 'package:iucome/database/db.dart';
 void main() {
   runApp(IucomeApp());
@@ -21,7 +21,7 @@ class IucomeApp extends StatelessWidget {
       initialRoute: authorizationRoute,
       routes: <String,WidgetBuilder>{
         homeRoute: (context) => BottomTabbar(),
-        authorizationRoute: (context) => const AuthorizationPage(), 
+        authorizationRoute: (context) => const AuthorizationPage(),
         currencyRoute: (context) => const CurPage()
       },
     );

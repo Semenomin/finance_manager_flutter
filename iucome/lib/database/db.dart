@@ -1,4 +1,4 @@
- 
+
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
@@ -6,10 +6,10 @@ import 'package:http/http.dart' as http;
 import 'package:iucome/entitys/wallet.dart';
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
-import 'package:iucome/http_config.dart';
+import 'package:iucome/configs/http_config.dart';
 
 class DaBa {
-  
+
 
   static Future<String> initDb(String dbName) async {
     final databasePath = await getDatabasesPath();
@@ -44,7 +44,6 @@ class DaBa {
   static Future<void> createUser(String id,String pass,String login) async{
     var path = await initDb('iucome.db');
     var db = await openDatabase(path);
-    print(2);
     await db.rawInsert("insert into wallets (user_id,name) VALUES ('$id','necessary'),('$id','entertainment'), ('$id','saving'),('$id','education'),('$id','reserve'),('$id','presents');");
     await db.rawInsert("insert into users (user_id,login,pass) VALUES ('$id','$login','$pass');");
   }
@@ -88,7 +87,7 @@ class DaBa {
       cat.add(WalletCategory(ca.values.elementAt(0),ca.values.elementAt(1),await DaBa.getCategoryExpenses(ca.values.elementAt(0),id),await DaBa.getCategoryIncomes(ca.values.elementAt(0), id)));
     }
     var res2 = await db.rawQuery("SELECT category FROM incomes where user_id=\'$id\' GROUP BY category");
-      if(!res2.isEmpty){
+      if(res2.isNotEmpty){
         if(cat.length == 0){
           cat.add(WalletCategory(res2[0].values.elementAt(0),0,await DaBa.getCategoryExpenses(res2[0].values.elementAt(0),id),await DaBa.getCategoryIncomes(res2[0].values.elementAt(0), id)));
         }
@@ -103,10 +102,10 @@ class DaBa {
         for (var cats in cat2) {
           cat.add(cats);
         }
-        return cat; 
+        return cat;
       }
     return cat;
-    
+
   }
 
   static Future<List<Expence>> getCategoryExpenses(String category,String id) async {
@@ -211,13 +210,13 @@ class DaBa {
         await db.rawQuery("insert into expenses(user_id,name,cash_amount,wallet,category,date,sync) values(\'$user_id\',\'$name\',$mcash,\'$wall\',\'$cat\',datetime(CURRENT_TIMESTAMP, 'localtime'),1)");
         await db.rawQuery("update wallets set cash_amount = cash_amount-$mcash where name='$wall' and user_id='$user_id'");
         await http.post('http://${HttpConfig.ip}:${HttpConfig.port}/db/createEx?name=$name&cash=$mcash&category=$cat&user=$user_id&wallet=$wall').then((f){
-          Timer(Duration(seconds: 3), () => db.rawQuery("update users set last_sync=datetime(CURRENT_TIMESTAMP, 'localtime') where user_id=\'$user_id\'")); 
+          Timer(Duration(seconds: 3), () => db.rawQuery("update users set last_sync=datetime(CURRENT_TIMESTAMP, 'localtime') where user_id=\'$user_id\'"));
         });
       }
     }
     catch(ex){
       await db.rawQuery("insert into expenses(user_id,name,cash_amount,wallet,category,date,sync) values($user_id,\'$name\',$mcash,\'$wall\',\'$cat\',datetime(CURRENT_TIMESTAMP, 'localtime'),0)");
-      await db.rawQuery("update wallets set cash_amount = cash_amount-$mcash where name='$name' and user_id='$user_id'");  
+      await db.rawQuery("update wallets set cash_amount = cash_amount-$mcash where name='$name' and user_id='$user_id'");
     }
   }
 
@@ -242,7 +241,7 @@ class DaBa {
     if(await checkUserId(user_id)){
      await DaBa.syncDBexpense(user_id);
      await DaBa.syncDBincome(user_id);
-     
+
     }
     else {
      await createUser(user_id,pass,login);

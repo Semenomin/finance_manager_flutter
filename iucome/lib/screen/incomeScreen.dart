@@ -1,12 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:iucome/entitys/currency.dart';
-import 'package:http/http.dart' as http;
-import 'dart:convert';
-
-import 'CustomDialog.dart';
 import 'CustomIncomeDialog.dart';
-import 'database/db.dart';
-import 'entitys/wallet.dart';
+import 'package:iucome/database/db.dart';
+import 'package:iucome/entitys/wallet.dart';
 
 class IncomePage extends StatefulWidget {
   IncomePage({this.cat,this.wall,this.user_id, Key key}) : super(key: key);

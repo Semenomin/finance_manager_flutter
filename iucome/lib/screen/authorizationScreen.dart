@@ -2,10 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:iucome/app.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:toast/toast.dart';
-import 'package:iucome/image_placeholder.dart';
-import 'package:iucome/appColors.dart';
+import 'package:iucome/layout/image_placeholder.dart';
+import 'package:iucome/configs/appColors.dart';
 import 'package:http/http.dart' as http;
-import 'package:iucome/http_config.dart';
+import 'package:iucome/configs/http_config.dart';
 import 'package:iucome/database/db.dart';
 
 class AuthorizationPage extends StatefulWidget {
@@ -28,7 +28,7 @@ class _AuthorizationPageState extends State<AuthorizationPage> {
           passwordController: _passwordController,
         )
       )
-    );   
+    );
   }
 
   @override
@@ -45,10 +45,8 @@ class _MainView extends StatelessWidget {
     this.passwordController,
     this.usernameController
   }) : super(key: key);
-  
   TextEditingController usernameController;
   TextEditingController passwordController;
-  
   @override
   Widget build(BuildContext context) {
     List<Widget> listViewChildren;
@@ -101,7 +99,7 @@ class _SmallLogo extends StatelessWidget{
 
 class _UsernameTextField extends StatelessWidget {
 
-TextEditingController controller; 
+TextEditingController controller;
 
 _UsernameTextField(TextEditingController controllerIn){
   controller = controllerIn;
@@ -110,7 +108,7 @@ _UsernameTextField(TextEditingController controllerIn){
   @override
   Widget build(BuildContext context) {
 
-    
+
 
     final colorScheme = Theme.of(context).colorScheme;
 
@@ -135,7 +133,7 @@ _UsernameTextField(TextEditingController controllerIn){
 
 class _PasswordTextField extends StatelessWidget {
 
-TextEditingController controller; 
+TextEditingController controller;
 
 _PasswordTextField(TextEditingController controllerIn){
   controller = controllerIn;
@@ -180,7 +178,7 @@ class PrimaryColorOverride extends StatelessWidget {
 }
 
 class LoginButton extends StatefulWidget {
-  LoginButton({ 
+  LoginButton({
     this.passwordController,
     this.usernameController
     });
@@ -192,14 +190,14 @@ class LoginButton extends StatefulWidget {
 }
 
 class _LoginButtonState  extends State<LoginButton> {
-  _LoginButtonState( 
+  _LoginButtonState(
     this.passwordController,
     this.usernameController
     );
 
   final TextEditingController usernameController;
   final TextEditingController passwordController;
-  
+
   @override
   Widget build(BuildContext context) {
     return ButtonBar(
@@ -242,7 +240,7 @@ class _LoginButtonState  extends State<LoginButton> {
         ),
         onPressed: () {
             _registration(usernameController.text.toString(), passwordController.text.toString()).then((res){
-            
+
             if(res[0]){
               setdata(res[1]).then(
                 DaBa.createUser(res[1],usernameController.text.toString(),passwordController.text.toString()),

@@ -1,11 +1,10 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:iucome/CustomDialog.dart';
+import 'package:iucome/screen/CustomDialog.dart';
 import 'package:iucome/app.dart';
-import 'package:iucome/appColors.dart';
 import 'package:iucome/entitys/tab.dart';
 import 'package:iucome/entitys/wallet.dart';
-import 'package:iucome/incomePage.dart';
+import 'package:iucome/screen/incomeScreen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
 import 'package:iucome/entitys/subItem.dart';
@@ -25,7 +24,7 @@ class BottomTabbar extends StatefulWidget {
 class _BottomTabbarState extends State<BottomTabbar> with SingleTickerProviderStateMixin{
 
   String user_id;
-  
+
   TabController _tabController;
 
   static const _kTabs = <Widget>[
@@ -33,7 +32,7 @@ class _BottomTabbarState extends State<BottomTabbar> with SingleTickerProviderSt
     Tab(icon: Icon(Icons.account_balance_wallet),text:'Wallets'),
     Tab(icon: Icon(Icons.arrow_upward),text:'Expences')
   ];
-  
+
   @override
   void initState(){
     super.initState();
@@ -42,7 +41,7 @@ class _BottomTabbarState extends State<BottomTabbar> with SingleTickerProviderSt
       vsync: this
     );
   }
-  
+
   @override
   void dispose(){
     _tabController.dispose();
@@ -82,7 +81,7 @@ class _BottomTabbarState extends State<BottomTabbar> with SingleTickerProviderSt
                     children: <Widget>[
                       IncomePage(cat: categories,wall: wallets,user_id: user_id),
                       WalletsTab(wallets,categories),
-                      AppBarExpensesPage(cat:categories,wall:wallets,user_id: user_id,),   
+                      AppBarExpensesPage(cat:categories,wall:wallets,user_id: user_id,),
                     ],
                     controller: _tabController
                   );
@@ -99,17 +98,15 @@ class _BottomTabbarState extends State<BottomTabbar> with SingleTickerProviderSt
         controller: _tabController
         ),
       ),
-    );  
+    );
   }
 }
 
 class WalletsTab extends StatelessWidget {
 
   WalletsTab(this.wallets,this.categories);
-  
   List<Wallet> wallets = [];
   List<WalletCategory> categories = [];
-  
   static final tabs = <MyTab>[
    MyTab("Necessary",    "55%"),
    MyTab("Entertainment","10%"),
@@ -184,7 +181,7 @@ class _PieWalletState extends State<PieWallet> {
 
 SfCircularChart getDefaultPieChart(bool isTileView,Wallet wallet,List<WalletCategory> cat) {
   return SfCircularChart(
-    
+
     title: ChartTitle(
       text: isTileView ? '' : wallet.cash.toString()+" \$"),
     legend: Legend(isVisible: isTileView ? false : true),
@@ -291,7 +288,7 @@ class _AppBarExpensesPageState extends State<AppBarExpensesPage> {
                         ],
                       )
                     ],
-                  ) 
+                  )
                 ),
               )
             ),
@@ -301,7 +298,7 @@ class _AppBarExpensesPageState extends State<AppBarExpensesPage> {
       }
 
       }
-      
+
       boxes.add(SizedBox(
             height: 50,
             child: FlatButton(
@@ -309,12 +306,12 @@ class _AppBarExpensesPageState extends State<AppBarExpensesPage> {
                 setState((){
                   excat = item.name;
                 });
-              }, 
+              },
               child: Text(
                 item.name,
                 style: TextStyle(
                   fontSize: 20,
-                  fontWeight: FontWeight.normal    
+                  fontWeight: FontWeight.normal
                 ),
               )),
           ));
@@ -334,7 +331,7 @@ class _AppBarExpensesPageState extends State<AppBarExpensesPage> {
       ),
       actions: <Widget>[
       IconButton(
-        icon: Icon(Icons.add), 
+        icon: Icon(Icons.add),
         onPressed: (){
           showDialog(
             context: context,
