@@ -8,19 +8,23 @@ import 'package:iucome/app.dart';
 
 class CustomDialog extends StatefulWidget {
 
-  CustomDialog({this.cat,this.wall,this.user_id,Key key}) : super(key: key);
+  CustomDialog({this.cat,this.wall,this.user_id,this.ex,this.category,Key key}) : super(key: key);
   List<WalletCategory> cat = [];
   List<Wallet> wall = [];
   String user_id;
+  Expence ex;
+  String category;
   @override
-  _CustomDialogState createState() => _CustomDialogState(cat,wall,user_id);
+  _CustomDialogState createState() => _CustomDialogState(cat,wall,user_id,ex,category);
 }
 
 class _CustomDialogState extends State<CustomDialog> {
-  _CustomDialogState(List<WalletCategory> cat,List<Wallet> wall,String user_id){
+  _CustomDialogState(List<WalletCategory> cat,List<Wallet> wall,String user_id,Expence ex,String category){
     this.cat = cat;
     this.wall = wall;
     this.user_id = user_id;
+    this.ex = ex;
+    this.category = category;
   }
 
   var formatter = new DateFormat('dd-MM-yyyy');
@@ -28,7 +32,8 @@ class _CustomDialogState extends State<CustomDialog> {
   String user_id;
   List<WalletCategory> cat = [];
   List<Wallet> wall = [];
-
+  Expence ex;
+  String category;
 
   TextEditingController _controllerCash = TextEditingController();
   TextEditingController _controllerName = TextEditingController();
@@ -37,14 +42,21 @@ class _CustomDialogState extends State<CustomDialog> {
   String _selectedCategory;
   String _selectedWallet;
 
-
   @override
   Widget build(BuildContext context) {
 
     List<DropdownMenuItem<String>> _dropDownCategoryItem = [];
     List<DropdownMenuItem<String>> _dropDownWalletItem = [];
-    _dropDownCategoryItem.clear();
-    _dropDownWalletItem.clear();
+
+
+    if(ex!=null){
+      setState(() {
+        _controllerCash.text = ex.cash.toString();
+        _controllerName.text = ex.name;
+        _selectedCategory = category;
+      });
+    }
+
     for (var item in cat) {
       _dropDownCategoryItem.add(DropdownMenuItem<String>(
         value: item.name,

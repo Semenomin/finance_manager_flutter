@@ -1,3 +1,13 @@
+
+class Debt {
+  Debt({this.cash,this.person,this.close,this.date,this.is_income});
+  double cash;
+  String person;
+  String date;
+  bool is_income;
+  bool close;
+}
+
 class Wallet{
   Wallet(this.name,this.cash);
   String name;

@@ -321,4 +321,42 @@ class DaBa {
       return false;
     }
   }
+
+  static Future<List<Debt>> getDebts(String user_id)async{
+    try{
+       List<Debt> debts = [];
+    var response = await http.get('http://${HttpConfig.ip}:${HttpConfig.port}/debts?user_id=$user_id');
+    Map data = await json.decode(response.body) as Map;
+    data["rows"].forEach((f){
+      debts.add(
+        Debt(
+        cash: double.parse(f["cash"]),
+        person: f["person"],
+        date: f["date"],
+        is_income: f["is_income"],
+        close: f["close"]
+        )
+      );
+    });
+    return debts;
+    }
+  catch(ex){
+    return null;
+  }
+  }
+
+  static Future<void> closeDebt(String user_id,String person)async{
+    var res = await http.get("http://${HttpConfig.ip}:${HttpConfig.port}/debts/close?user_id=$user_id&person='$person'");
+    return res;
+  }
+
+  static Future<void> openDebt(String user_id,String person)async{
+    var res = await http.get("http://${HttpConfig.ip}:${HttpConfig.port}/debts/open?user_id=$user_id&person='$person'");
+    return res;
+  }
+
+  static Future<void> addDebt(Debt debt,String user_id)async{
+    var res = await http.get("http://${HttpConfig.ip}:${HttpConfig.port}/debts/add?user_id=${user_id}&cash=${debt.cash}&person='${debt.person}'&is_income='${debt.is_income}'");
+    return res;
+  }
 }

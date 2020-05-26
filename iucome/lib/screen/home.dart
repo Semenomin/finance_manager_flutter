@@ -4,6 +4,7 @@ import 'package:iucome/screen/CustomDialog.dart';
 import 'package:iucome/app.dart';
 import 'package:iucome/entitys/tab.dart';
 import 'package:iucome/entitys/wallet.dart';
+import 'package:iucome/screen/debtsScreen.dart';
 import 'package:iucome/screen/incomeScreen.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
 import 'package:iucome/entitys/subItem.dart';
@@ -27,13 +28,14 @@ class _BottomTabbarState extends State<BottomTabbar>
   static const _kTabs = <Widget>[
     Tab(icon: Icon(Icons.arrow_downward), text: 'Incomes'),
     Tab(icon: Icon(Icons.account_balance_wallet), text: 'Wallets'),
-    Tab(icon: Icon(Icons.arrow_upward), text: 'Expences')
+    Tab(icon: Icon(Icons.arrow_upward), text: 'Expences'),
+    Tab(icon: Icon(Icons.access_time), text: 'Debts')
   ];
 
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 3, vsync: this);
+    _tabController = TabController(length: 4, vsync: this);
   }
 
   @override
@@ -78,6 +80,7 @@ class _BottomTabbarState extends State<BottomTabbar>
                         wall: wallets,
                         user_id: user_id,
                       ),
+                      DebtsScreen(cat: categories, user_id: user_id)
                     ], controller: _tabController);
                   }
                 });
@@ -250,7 +253,19 @@ class _AppBarExpensesPageState extends State<AppBarExpensesPage> {
                 borderRadius: BorderRadius.all(Radius.circular(16.0)),
               ),
               child: InkWell(
-                  onTap: () {},
+                  onLongPress: () {
+                    showDialog(
+                        context: context,
+                        builder: (context) {
+                          return CustomDialog(
+                            cat: cat,
+                            wall: wall,
+                            user_id: user_id,
+                            ex: Expence(item2.name,item2.cash,DateTime.now().toString()),
+                            category: item.name,
+                          );
+                        });
+                  },
                   child: Align(
                     alignment: Alignment.topLeft,
                     child: Padding(
